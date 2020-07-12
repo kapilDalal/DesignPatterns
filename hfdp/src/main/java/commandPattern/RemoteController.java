@@ -1,10 +1,13 @@
 package commandPattern;
 
+import java.util.Stack;
+
 public class RemoteController {
 	
-	Command[] onSlot;
-	Command[] offSlot;
-	Command undo;
+	private Command[] onSlot;
+	private Command[] offSlot;
+	private Stack<Command> undoStack;	
+	
 	public RemoteController(){
 		this.onSlot = new Command[7]; 
 		this.offSlot = new Command[7];
@@ -12,6 +15,7 @@ public class RemoteController {
 			this.onSlot[i] = new NoCommand();
 			this.offSlot[i] = new NoCommand();
 		}	
+		undoStack = new Stack<Command>();
 	}
 	public void setCommand(int num,Command  onCommand,Command offCommand){
 		this.onSlot[num] = onCommand;
@@ -19,17 +23,20 @@ public class RemoteController {
 	}
 	
 	public void onButtonPressed(int num){
-		onSlot[num].execute();
-		undo = onSlot[num];
+		onSlot[num].execute();		
+		undoStack.add(onSlot[num]);
 	}
 	
 	public void offButtonPressed(int num){
-		offSlot[num].execute();
-		undo = offSlot[num];
+		offSlot[num].execute();		
+		undoStack.add(offSlot[num]);
 	}
 	
-	public void undoButtonPressed(){
-		undo.undo();
+	public void undoButtonPressed(){		
+		if(!undoStack.isEmpty()) {
+			Command command = undoStack.pop();
+			command.undo();
+		}
 	}
 
 }
